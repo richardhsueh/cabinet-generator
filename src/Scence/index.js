@@ -1,19 +1,8 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
-import {
-  Effects,
-  OrbitControls,
-  PivotControls,
-  useFBO,
-} from "@react-three/drei";
-import {
-  Geometry,
-  Base,
-  Subtraction,
-  Addition,
-  ReverseSubtraction,
-} from "@react-three/csg";
+import { OrbitControls } from "@react-three/drei";
+import { Geometry, Base, Subtraction, Addition } from "@react-three/csg";
 import Environment from "../Environment";
 
 const box = new THREE.BoxGeometry();
@@ -24,12 +13,19 @@ const cabinetWidth = 35;
 const cabinetHeight = 70;
 const cabinetDepth = 30;
 const materialThickness = 1.2;
-const numOfDrawer = 3;
+const numOfDrawer = 4;
 const clearance = 0.2;
+
+const railWidth = 1.2;
+const railHeight = 2.4;
+const railDepthOffset = 2.4;
+const railHeightOffset = railHeight / 2;
 
 const drawerWidth = cabinetWidth - materialThickness * 2 - clearance * 2;
 const drawerHeight =
-  (cabinetHeight - materialThickness * 2) / numOfDrawer - clearance;
+  (cabinetHeight - materialThickness * 2 - railHeight * (numOfDrawer - 1)) /
+    numOfDrawer -
+  clearance;
 const drawerDepth = cabinetDepth;
 const drawerHeightOffset = drawerHeight / 2;
 const firstDrawerPost = (cabinetHeight - materialThickness * 2) / 2;
@@ -66,6 +62,7 @@ function Cabinet(props) {
         />
         <BackPanel />
         <Drawers />
+        <Rails />
       </Geometry>
       <meshStandardMaterial envMapIntensity={0.25} />
     </mesh>
@@ -87,9 +84,14 @@ const BackPanel = (props) => {
 const Drawers = () => {
   let tmpArg = [];
   for (let i = 0; i < numOfDrawer; i++) {
-    tmpArg.push(firstDrawerPost - drawerHeightOffset - drawerHeight * i - clearance * i);
+    tmpArg.push(
+      firstDrawerPost -
+        drawerHeightOffset -
+        drawerHeight * i -
+        clearance * i -
+        railHeight * i
+    );
   }
-
   return tmpArg.map((x, index) => {
     return <Drawer drawerXPost={x} key={index} />;
   });
@@ -116,5 +118,47 @@ const Drawer = ({ drawerXPost }) => {
         />
       </Geometry>
     </Addition>
+  );
+};
+
+const Rails = () => {
+  let tmpArg = [];
+  for (let i = 1; i < numOfDrawer; i++) {
+    tmpArg.push(
+      firstDrawerPost -
+        drawerHeight * i -
+        clearance * i -
+        railHeight * i +
+        railHeightOffset
+    );
+  }
+  return tmpArg.map((x, index) => {
+    return <Rail drawerXPost={x} key={index} />;
+  });
+};
+
+const Rail = ({ drawerXPost }) => {
+  const railX = (cabinetWidth - materialThickness) / 2 - railWidth;
+  const railZ = railDepthOffset / 2;
+
+  return (
+    <>
+      <Geometry>
+        <Base
+          name="rail"
+          geometry={box}
+          scale={[railWidth, railHeight, cabinetDepth - railDepthOffset]}
+          position={[-railX, -drawerXPost, -railZ]}
+        />
+      </Geometry>
+      <Geometry>
+        <Base
+          name="rail2"
+          geometry={box}
+          scale={[railWidth, railHeight, cabinetDepth - railDepthOffset]}
+          position={[railX, -drawerXPost, -railZ]}
+        />
+      </Geometry>
+    </>
   );
 };
