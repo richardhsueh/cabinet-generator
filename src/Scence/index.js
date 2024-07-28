@@ -13,7 +13,7 @@ const cabinetWidth = 35;
 const cabinetHeight = 70;
 const cabinetDepth = 30;
 const materialThickness = 1.2;
-const numOfDrawer = 4;
+const numOfDrawer = 9;
 const clearance = 0.2;
 
 const railWidth = 1.2;
@@ -128,8 +128,7 @@ const Rails = () => {
       firstDrawerPost -
         drawerHeight * i -
         clearance * i -
-        railHeight * i +
-        railHeightOffset
+        railHeight * i + railHeightOffset
     );
   }
   return tmpArg.map((x, index) => {
