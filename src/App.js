@@ -1,6 +1,6 @@
 import "./App.css";
 import React from "react";
-import Scene from "./Scence";
+import Scene from "./Scene";
 
 const App = () => {
   return (
